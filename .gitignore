@@ -66,3 +66,7 @@ logs/
 # Local databases
 *.db
 *.sqlite3
+postgres_data/
+
+# Lab 2 artifacts (keep commands txt; screenshots are local)
+docs/LAB2_SCREENSHOTS/

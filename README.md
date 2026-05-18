@@ -1,45 +1,53 @@
-# FastAPI Project Template
+# FastAPI Project
 
-Scalable FastAPI starter with Poetry, layered structure (`api`, `core`, `schemas`), versioned routes, and settings via environment variables.
+Production-ready layout with Poetry, Docker, PostgreSQL, and Alembic.
 
-## Requirements
+## Structure
 
-- Python 3.11+
-- [Poetry](https://python-poetry.org/docs/#installation)
+```
+app/
+├── main.py              # Entry point (app = FastAPI())
+├── core/                # config, security, exceptions
+├── api/v1/endpoints/    # auth, users, posts, health
+├── crud/                # Database operations
+├── models/              # SQLAlchemy models
+├── schemas/             # Pydantic schemas
+├── db/                  # session, base (Alembic metadata)
+└── utils/               # helpers (email, etc.)
+tests/
+alembic/                 # DB migrations
+```
 
-## Quick start
+## Local development
 
 ```powershell
-cd c:\Users\Denis\Desktop\taras
 poetry install
+copy .env.example .env
 poetry run serve
 ```
 
-API: http://127.0.0.1:8000  
-Docs: http://127.0.0.1:8000/docs  
-Health: http://127.0.0.1:8000/api/v1/health
+- Docs: http://127.0.0.1:8000/docs
+- Health: http://127.0.0.1:8000/api/v1/health
 
-Copy `.env.example` to `.env` and adjust values as needed.
+## Migrations
 
-## Project layout
-
-```
-src/fastapi_project/
-├── main.py              # App factory & entrypoint
-├── api/v1/              # Versioned API routers
-├── core/config.py       # Settings (pydantic-settings)
-└── schemas/             # Pydantic models
-tests/                   # Pytest suite
+```powershell
+poetry run alembic revision --autogenerate -m "init"
+poetry run alembic upgrade head
 ```
 
-## Commands
+## Docker (2 containers: API + PostgreSQL)
 
-| Command | Description |
-|---------|-------------|
-| `poetry run serve` | Start dev server with reload |
-| `poetry run pytest` | Run tests |
-| `poetry run ruff check src tests` | Lint |
+**Production:**
 
-## Git branches (Lab 1)
+```powershell
+docker compose up -d --build
+```
 
-See [docs/LAB_GIT.md](docs/LAB_GIT.md) for creating the GitHub repo, `dev` / `main` branches, and the `git_logs.txt` file on `dev`.
+**Development** (`--reload` + volume `.:/app`):
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+```
+
+See [docs/LAB2.md](docs/LAB2.md).

@@ -1,0 +1,25 @@
+FROM python:3.12-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    POETRY_VERSION=2.4.1 \
+    POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_NO_INTERACTION=1 \
+    PYTHONPATH=/app
+
+WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && pip install --no-cache-dir "poetry==${POETRY_VERSION}" \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml poetry.lock README.md ./
+COPY app ./app
+
+RUN poetry install --only main --no-root \
+    && poetry install --only main
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

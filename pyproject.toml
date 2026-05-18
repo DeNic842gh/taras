@@ -4,13 +4,19 @@ version = "0.1.0"
 description = "Scalable FastAPI project template"
 authors = ["Denis <denic842rb@gmail.com>"]
 readme = "README.md"
-packages = [{ include = "fastapi_project", from = "src" }]
+packages = [{ include = "app" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.136.1"
 uvicorn = { extras = ["standard"], version = "^0.47.0" }
 pydantic-settings = "^2.13.0"
+pydantic = { extras = ["email"], version = "^2.13.0" }
+sqlalchemy = { extras = ["asyncio"], version = "^2.0.0" }
+asyncpg = "^0.31.0"
+alembic = "^1.18.0"
+python-jose = { extras = ["cryptography"], version = "^3.5.0" }
+passlib = { extras = ["bcrypt"], version = "^1.7.4" }
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.0"
@@ -18,7 +24,7 @@ httpx = "^0.28.0"
 ruff = "^0.15.0"
 
 [tool.poetry.scripts]
-serve = "fastapi_project.main:run"
+serve = "app.main:run"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -30,4 +36,4 @@ target-version = "py311"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["."]
