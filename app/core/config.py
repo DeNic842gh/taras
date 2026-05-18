@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     secret_key: str = Field(default="change-me-in-production", alias="SECRET_KEY")
     access_token_expire_minutes: int = Field(default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
 
+    use_memory_store: bool = Field(default=True, alias="USE_MEMORY_STORE")
+
     @property
     def resolved_database_url(self) -> str:
         if self.database_url:

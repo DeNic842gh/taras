@@ -25,6 +25,7 @@ ruff = "^0.15.0"
 
 [tool.poetry.scripts]
 serve = "app.main:run"
+start = "app.main:run"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

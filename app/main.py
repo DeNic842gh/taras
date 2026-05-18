@@ -6,13 +6,17 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_v1_router
 from app.core.config import settings
-from app.db.session import engine
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    yield
-    await engine.dispose()
+    if not settings.use_memory_store:
+        from app.db.session import engine
+
+        yield
+        await engine.dispose()
+    else:
+        yield
 
 
 def create_app() -> FastAPI:
@@ -50,7 +54,3 @@ def run() -> None:
         port=settings.port,
         reload=settings.debug,
     )
-
-
-if __name__ == "__main__":
-    run()

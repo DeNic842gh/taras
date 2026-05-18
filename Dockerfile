@@ -14,12 +14,12 @@ RUN apt-get update \
     && pip install --no-cache-dir "poetry==${POETRY_VERSION}" \
     && rm -rf /var/lib/apt/lists/*
 
-COPY pyproject.toml poetry.lock README.md ./
+COPY pyproject.toml poetry.lock README.md main.py ./
 COPY app ./app
 
-RUN poetry install --only main --no-root \
-    && poetry install --only main
+RUN poetry install --only main --no-interaction --no-root \
+    && poetry install --only main --no-interaction
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "main.py"]

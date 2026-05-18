@@ -18,3 +18,8 @@ class UnauthorizedException(HTTPException):
 class ForbiddenException(HTTPException):
     def __init__(self, detail: str = "Not enough permissions") -> None:
         super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
+
+
+class ConflictException(HTTPException):
+    def __init__(self, detail: str = "Resource already exists") -> None:
+        super().__init__(status_code=status.HTTP_409_CONFLICT, detail=detail)
