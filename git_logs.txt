@@ -1,0 +1,5 @@
+# Git log snapshot (dev branch)
+# Replace this file after your first commit:
+#   git log --oneline --graph --decorate --all > git_logs.txt
+#
+# No commits exist yet — run the commands in docs/LAB_GIT.md first.
