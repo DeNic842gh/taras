@@ -33,7 +33,7 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
-      USE_MEMORY_STORE: "true"
+      USE_MEMORY_STORE: "false"
       HOST: 0.0.0.0
       PORT: 8000
       POSTGRES_HOST: db

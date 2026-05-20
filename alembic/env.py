@@ -8,7 +8,15 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.core.config import settings
 from app.db.base import Base
-from app.models import post, user  # noqa: F401
+from app.models import (  # noqa: F401
+    Category,
+    Order,
+    OrderItem,
+    Post,
+    Product,
+    User,
+    UserProfile,
+)
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.resolved_database_url)

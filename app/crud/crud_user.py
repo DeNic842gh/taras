@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import get_password_hash
+from app.core.password import hash_password
 from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
@@ -17,8 +17,19 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             email=obj_in.email,
             full_name=obj_in.full_name,
             is_active=obj_in.is_active,
-            hashed_password=get_password_hash(obj_in.password),
+            hashed_password=hash_password(obj_in.password),
         )
+        db.add(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
+        return db_obj
+
+    async def update(self, db: AsyncSession, *, db_obj: User, obj_in: UserUpdate) -> User:
+        update_data = obj_in.model_dump(exclude_unset=True)
+        if "password" in update_data:
+            update_data["hashed_password"] = hash_password(update_data.pop("password"))
+        for field, value in update_data.items():
+            setattr(db_obj, field, value)
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)

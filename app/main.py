@@ -15,13 +15,10 @@ MARINE_SITE_DIR = Path(__file__).resolve().parent.parent / "marine-site"
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    if not settings.use_memory_store:
-        from app.db.session import engine
+    from app.db.session import engine
 
-        yield
-        await engine.dispose()
-    else:
-        yield
+    yield
+    await engine.dispose()
 
 
 def create_app() -> FastAPI:

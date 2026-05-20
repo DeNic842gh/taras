@@ -26,7 +26,8 @@ copy .env.example .env
 python main.py
 ```
 
-Lab 3: in-memory Users CRUD — see [docs/LAB3.md](docs/LAB3.md).
+Lab 3: in-memory Users CRUD — [docs/LAB3.md](docs/LAB3.md).  
+Lab 4: PostgreSQL + Alembic — [docs/LAB4.md](docs/LAB4.md).
 
 - Docs: http://127.0.0.1:8000/docs
 - Health: http://127.0.0.1:8000/api/v1/health

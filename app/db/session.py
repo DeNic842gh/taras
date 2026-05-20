@@ -1,3 +1,7 @@
+"""
+Async database engine and session factory (Lab 4).
+"""
+
 from collections.abc import AsyncGenerator
 
 from sqlalchemy import text
@@ -5,13 +9,24 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from app.core.config import settings
 
-engine = create_async_engine(
-    settings.resolved_database_url,
-    echo=settings.debug,
-    pool_pre_ping=True,
-)
+_engine_kwargs: dict = {
+    "echo": settings.debug,
+    "pool_pre_ping": True,
+}
+if "sqlite" not in settings.resolved_database_url:
+    _engine_kwargs["pool_size"] = settings.db_pool_size
+    _engine_kwargs["max_overflow"] = settings.db_max_overflow
 
-AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+engine = create_async_engine(settings.resolved_database_url, **_engine_kwargs)
+
+# Session factory — inject via FastAPI Depends(get_db)
+AsyncSessionLocal = async_sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autoflush=False,
+    autocommit=False,
+)
 
 
 async def get_db() -> AsyncGenerator[AsyncSession]:
