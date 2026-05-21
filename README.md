@@ -69,3 +69,4 @@ poetry run alembic upgrade head
 ## Labs
 
 - [docs/LAB4.md](docs/LAB4.md) — PostgreSQL + screenshots for dev branch
+- [docs/LAB6.md](docs/LAB6.md) — pytest on separate PostgreSQL test DB (`docker compose -f docker-compose.test.yml up -d`, then `poetry run pytest`)

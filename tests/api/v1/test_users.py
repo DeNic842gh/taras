@@ -40,3 +40,8 @@ def test_create_user_validation_error(client) -> None:
         json={"email": "bad-email", "password": "short"},
     )
     assert response.status_code == 422
+
+
+def test_get_user_not_found(client) -> None:
+    response = client.get("/api/v1/users/99999")
+    assert response.status_code == 404

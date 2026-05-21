@@ -30,6 +30,11 @@ class Settings(BaseSettings):
     postgres_db: str = Field(default="fastapi_db", alias="POSTGRES_DB")
     database_url: str | None = Field(default=None, alias="DATABASE_URL")
 
+    postgres_test_host: str = Field(default="localhost", alias="POSTGRES_TEST_HOST")
+    postgres_test_port: int = Field(default=5433, alias="POSTGRES_TEST_PORT")
+    postgres_test_db: str = Field(default="fastapi_test_db", alias="POSTGRES_TEST_DB")
+    test_database_url: str | None = Field(default=None, alias="TEST_DATABASE_URL")
+
     secret_key: str = Field(default="change-me-in-production", alias="SECRET_KEY")
     access_token_expire_minutes: int = Field(default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
 
@@ -43,6 +48,15 @@ class Settings(BaseSettings):
         return (
             f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+        )
+
+    @property
+    def resolved_test_database_url(self) -> str:
+        if self.test_database_url:
+            return self.test_database_url
+        return (
+            f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
+            f"@{self.postgres_test_host}:{self.postgres_test_port}/{self.postgres_test_db}"
         )
 
 

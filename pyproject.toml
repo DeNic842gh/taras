@@ -29,6 +29,7 @@ pytest-asyncio = "^1.3.0"
 serve = "app.main:run"
 start = "app.main:run"
 seed-db = "app.db.seed:run"
+test = "pytest:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
