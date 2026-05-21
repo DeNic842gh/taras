@@ -33,8 +33,6 @@ class Settings(BaseSettings):
     secret_key: str = Field(default="change-me-in-production", alias="SECRET_KEY")
     access_token_expire_minutes: int = Field(default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
 
-    use_memory_store: bool = Field(default=False, alias="USE_MEMORY_STORE")
-
     db_pool_size: int = Field(default=5, alias="DB_POOL_SIZE")
     db_max_overflow: int = Field(default=10, alias="DB_MAX_OVERFLOW")
 

@@ -10,7 +10,9 @@ from fastapi.staticfiles import StaticFiles
 from app.api.v1.router import api_v1_router
 from app.core.config import settings
 
-MARINE_SITE_DIR = Path(__file__).resolve().parent.parent / "marine-site"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+MARINE_SITE_DIR = PROJECT_ROOT / "marine-site"
+STATIC_DIR = PROJECT_ROOT / "static"
 
 
 @asynccontextmanager
@@ -45,6 +47,9 @@ def create_app() -> FastAPI:
             StaticFiles(directory=str(MARINE_SITE_DIR), html=True),
             name="marine-site",
         )
+
+    static_path = STATIC_DIR if STATIC_DIR.is_dir() else PROJECT_ROOT
+    application.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 
     @application.get("/", tags=["root"])
     async def root() -> dict[str, str]:

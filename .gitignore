@@ -68,7 +68,12 @@ logs/
 *.sqlite3
 postgres_data/
 
-# Lab 2 artifacts (keep commands txt; screenshots are local)
+# Lab artifacts (keep commands txt; screenshots are local)
 docs/LAB2_SCREENSHOTS/
 docs/LAB3_SCREENSHOTS/
 docs/LAB4_SCREENSHOTS/
+
+# Large asset files (slow down git operations)
+marine-site/assets/
+photo/Lab3/
+photo/Lab4/

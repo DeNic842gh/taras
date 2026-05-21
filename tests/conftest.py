@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
-os.environ["USE_MEMORY_STORE"] = "false"
 
 from app.db.base import Base
 from app.db.session import get_db

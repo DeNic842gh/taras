@@ -1,5 +1,6 @@
 def test_users_crud_flow(client) -> None:
     create_payload = {
+        "username": "alice",
         "email": "alice@example.com",
         "full_name": "Alice",
         "password": "secret123",

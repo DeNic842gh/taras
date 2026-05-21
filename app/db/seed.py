@@ -12,26 +12,36 @@ from app.models import Category, Order, OrderItem, Post, Product, User, UserProf
 # --- Sample records (referenced in lab documentation) ---
 SAMPLE_USERS = [
     {
+        "username": "marine",
         "email": "marine@houshou.pirate",
         "password": "ahoy12345",
         "full_name": "Houshou Marine",
     },
     {
+        "username": "crew_mate",
         "email": "crew@houshou.pirate",
         "password": "treasure99",
         "full_name": "Pirate Crew Mate",
+    },
+    {
+        "username": "shopper",
+        "email": "shopper@example.com",
+        "password": "shopper123",
+        "full_name": "Treasure Shopper",
     },
 ]
 
 SAMPLE_PROFILES = [
     {"bio": "Captain of the Houshou Pirates. Ahoy!", "country": "Japan"},
     {"bio": "Treasure hunter in training.", "country": "International"},
+    {"bio": "Collects pirate merch and music.", "country": "USA"},
 ]
 
 SAMPLE_CATEGORIES = [
     {"name": "Merchandise", "description": "Official-style pirate goods"},
     {"name": "Music", "description": "Albums and digital singles"},
     {"name": "Treasure", "description": "Rare collectibles"},
+    {"name": "Apparel", "description": "Clothing and accessories"},
 ]
 
 SAMPLE_PRODUCTS = [
@@ -56,6 +66,20 @@ SAMPLE_PRODUCTS = [
         "stock": 20,
         "category_index": 2,
     },
+    {
+        "name": "Pirate Coat",
+        "description": "Captain's coat replica",
+        "price": Decimal("89.99"),
+        "stock": 15,
+        "category_index": 3,
+    },
+    {
+        "name": "Unison (Digital)",
+        "description": "Second original single",
+        "price": Decimal("1.99"),
+        "stock": 500,
+        "category_index": 1,
+    },
 ]
 
 SAMPLE_POSTS = [
@@ -74,6 +98,7 @@ async def seed_database() -> None:
         users: list[User] = []
         for data in SAMPLE_USERS:
             user = User(
+                username=data["username"],
                 email=data["email"],
                 hashed_password=hash_password(data["password"]),
                 full_name=data["full_name"],

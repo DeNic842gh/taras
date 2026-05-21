@@ -1,4 +1,6 @@
-# Lab 4 — PostgreSQL + Alembic
+# Lab 4 — PostgreSQL + Alembic (async)
+
+> Fake in-memory storage (`app/storage/`) was removed. All API data uses PostgreSQL.
 
 ## Models (7 tables)
 

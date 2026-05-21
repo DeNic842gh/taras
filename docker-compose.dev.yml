@@ -7,7 +7,6 @@ services:
     environment:
       APP_ENV: development
       APP_DEBUG: "true"
-      USE_MEMORY_STORE: "false"
     ports:
       - "8000:8000"
     volumes:
