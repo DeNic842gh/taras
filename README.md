@@ -28,6 +28,8 @@ python main.py
 
 Lab 3: in-memory Users CRUD — see [docs/LAB3.md](docs/LAB3.md).
 
+Lab 5: JWT + cookie auth, bcrypt passwords, protected endpoints — see [docs/LAB5.md](docs/LAB5.md).
+
 - Docs: http://127.0.0.1:8000/docs
 - Health: http://127.0.0.1:8000/api/v1/health
 

@@ -1,12 +1,8 @@
-import hashlib
 from threading import Lock
 
 from app.core.exceptions import ConflictException, NotFoundException
+from app.core.security import get_password_hash, verify_password
 from app.schemas.user import UserCreate, UserUpdate
-
-
-def _hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
 
 _lock = Lock()
 _users: dict[int, dict] = {}
@@ -14,7 +10,7 @@ _next_id = 1
 
 
 class UserMemoryStore:
-    """In-memory user storage (dict emulation) for Lab 3."""
+    """In-memory user storage (Lab 3). Passwords stored as bcrypt hashes."""
 
     def list_users(self, skip: int = 0, limit: int = 100) -> list[dict]:
         with _lock:
@@ -28,21 +24,39 @@ class UserMemoryStore:
             raise NotFoundException("User not found")
         return user
 
+    def get_by_username(self, username: str) -> dict | None:
+        with _lock:
+            for user in _users.values():
+                if user["username"] == username:
+                    return user
+        return None
+
+    def verify_login(self, username: str, password: str) -> dict | None:
+        user = self.get_by_username(username)
+        if user is None:
+            return None
+        if not verify_password(password, user["hashed_password"]):
+            return None
+        return user
+
     def create_user(self, user_in: UserCreate) -> dict:
         global _next_id
         with _lock:
             for existing in _users.values():
                 if existing["email"] == str(user_in.email).lower():
                     raise ConflictException("User with this email already exists")
+                if existing["username"] == user_in.username:
+                    raise ConflictException("Username already taken")
 
             user_id = _next_id
             _next_id += 1
             record = {
                 "id": user_id,
+                "username": user_in.username,
                 "email": str(user_in.email).lower(),
                 "full_name": user_in.full_name,
                 "is_active": user_in.is_active,
-                "hashed_password": _hash_password(user_in.password),
+                "hashed_password": get_password_hash(user_in.password),
             }
             _users[user_id] = record
         return record
@@ -61,12 +75,18 @@ class UserMemoryStore:
                         raise ConflictException("User with this email already exists")
                 user["email"] = email
 
+            if "username" in update_data and update_data["username"] is not None:
+                for uid, existing in _users.items():
+                    if uid != user_id and existing["username"] == update_data["username"]:
+                        raise ConflictException("Username already taken")
+                user["username"] = update_data["username"]
+
             if "full_name" in update_data:
                 user["full_name"] = update_data["full_name"]
             if "is_active" in update_data:
                 user["is_active"] = update_data["is_active"]
             if "password" in update_data and update_data["password"] is not None:
-                user["hashed_password"] = _hash_password(update_data["password"])
+                user["hashed_password"] = get_password_hash(update_data["password"])
 
             _users[user_id] = user
         return user
@@ -76,10 +96,6 @@ class UserMemoryStore:
             if user_id not in _users:
                 raise NotFoundException("User not found")
             del _users[user_id]
-
-    def count(self) -> int:
-        with _lock:
-            return len(_users)
 
     def reset(self) -> None:
         global _next_id
