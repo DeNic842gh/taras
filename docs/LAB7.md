@@ -91,6 +91,20 @@ git commit -m "Lab 7: Prometheus, Grafana, custom metrics, dashboards"
 
 ## Troubleshooting
 
+### Prometheus: `error mounting` / `failed to create shim task`
+
+**Cause:** `monitoring/prometheus/prometheus.yml` exists as a **folder** instead of a **file** (Docker cannot bind-mount a directory onto a file path).
+
+**Fix:**
+
+```powershell
+Remove-Item -Recurse -Force monitoring\prometheus\prometheus.yml
+# File monitoring/prometheus/prometheus.yml must exist (see repo)
+.\scripts\docker-fix-and-start.ps1
+```
+
+The compose file mounts the whole `./monitoring/prometheus` directory to `/etc/prometheus` to avoid single-file mount issues on Windows.
+
 ### `python: can't open file '/app/main.py'`
 
 The API image must include root `main.py`. Rebuild:

@@ -1,0 +1,78 @@
+# Lab 8 — Continuous Integration: lint, tests, Docker build
+name: CI
+
+on:
+  push:
+    branches: [main, master, dev, prod]
+  pull_request:
+    branches: [main, master, dev, prod]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  POETRY_VERSION: "2.4.1"
+  TEST_DATABASE_URL: postgresql+asyncpg://app:appsecret@localhost:5432/fastapi_test_db
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: appsecret
+          POSTGRES_DB: fastapi_test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app -d fastapi_test_db"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        run: pip install "poetry==${{ env.POETRY_VERSION }}"
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Ruff
+        run: poetry run ruff check app tests
+
+      - name: Wait for PostgreSQL
+        run: |
+          for i in $(seq 1 30); do
+            if pg_isready -h localhost -p 5432 -U app -d fastapi_test_db; then
+              echo "PostgreSQL is ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "PostgreSQL did not become ready in time"
+          exit 1
+
+      - name: Pytest
+        env:
+          TEST_DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
+        run: poetry run pytest -q --tb=short
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build API image
+        run: docker build -t fastapi-api:ci .

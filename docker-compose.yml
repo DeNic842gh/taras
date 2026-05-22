@@ -28,6 +28,13 @@ services:
       dockerfile: Dockerfile
     container_name: fastapi_app
     restart: unless-stopped
+    # Override broken CRLF shebang on Windows-built images (no rebuild needed)
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until pg_isready -h db -p 5432 -U app -d fastapi_db; do echo "waiting for db..."; sleep 3; done
+        poetry run alembic upgrade head
+        exec python main.py
     env_file:
       - .env
     environment:

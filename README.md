@@ -70,3 +70,5 @@ poetry run alembic upgrade head
 
 - [docs/LAB4.md](docs/LAB4.md) — PostgreSQL + screenshots for dev branch
 - [docs/LAB6.md](docs/LAB6.md) — pytest on separate PostgreSQL test DB (`docker compose -f docker-compose.test.yml up -d`, then `poetry run pytest`)
+- [docs/LAB7.md](docs/LAB7.md) — Prometheus & Grafana monitoring
+- [docs/LAB8.md](docs/LAB8.md) — AWS (ECS + RDS + ALB) & GitHub Actions CI/CD

@@ -1,0 +1,67 @@
+# Lab 7 — Prometheus, Grafana, exporters (merge with docker-compose.yml)
+# Run: docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d --build
+
+name: fastapi
+
+services:
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: fastapi_postgres_exporter
+    restart: unless-stopped
+    environment:
+      DATA_SOURCE_NAME: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-appsecret}@db:5432/${POSTGRES_DB:-fastapi_db}?sslmode=disable
+    ports:
+      - "9187:9187"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  docker_stats_exporter:
+    build:
+      context: ./monitoring/docker-stats-exporter
+    container_name: fastapi_docker_exporter
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "9417:9417"
+
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    container_name: fastapi_prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    volumes:
+      # Mount directory (not single file) — avoids Windows bind-mount issues
+      - ./monitoring/prometheus:/etc/prometheus:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+      - postgres_exporter
+      - docker_stats_exporter
+
+  grafana:
+    image: grafana/grafana:10.4.3
+    container_name: fastapi_grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus_data:
+  grafana_data:

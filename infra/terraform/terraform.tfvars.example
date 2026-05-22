@@ -1,0 +1,8 @@
+aws_region     = "eu-central-1"
+project_name   = "fastapi"
+image_tag      = "latest"
+desired_count  = 1
+
+# Optional — leave commented to auto-generate secure values:
+# db_password = "your-strong-db-password"
+# secret_key  = "your-long-jwt-secret-key"

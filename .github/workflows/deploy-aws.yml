@@ -1,0 +1,111 @@
+# Lab 8 — CD: build image → ECR → Terraform apply → ECS rolling deploy
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main, prod]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Docker tag (default: git SHA)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+env:
+  TF_WORKING_DIR: infra/terraform
+  TF_VAR_project_name: fastapi
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve image tag
+        id: meta
+        run: |
+          TAG="${{ github.event.inputs.image_tag }}"
+          if [ -z "$TAG" ]; then TAG="${{ github.sha }}"; fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Ensure ECR repository exists (Terraform)
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Terraform init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init -input=false
+
+      - name: Terraform apply (infrastructure + task definition)
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        env:
+          TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+          TF_VAR_image_tag: ${{ steps.meta.outputs.tag }}
+          TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
+          TF_VAR_secret_key: ${{ secrets.TF_VAR_secret_key }}
+        run: terraform apply -auto-approve -input=false
+
+      - name: Read Terraform outputs
+        id: tf
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "ecr_repo=$(terraform output -raw ecr_repository_name)" >> "$GITHUB_OUTPUT"
+          echo "ecs_cluster=$(terraform output -raw ecs_cluster_name)" >> "$GITHUB_OUTPUT"
+          echo "ecs_service=$(terraform output -raw ecs_service_name)" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ steps.tf.outputs.ecr_repo }}
+          IMAGE_TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          docker build -t "${IMAGE_URI}" .
+          docker push "${IMAGE_URI}"
+          docker tag "${IMAGE_URI}" "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
+          docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
+
+      - name: Update task definition with new image and deploy
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        env:
+          TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+          TF_VAR_image_tag: ${{ steps.meta.outputs.tag }}
+          TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
+          TF_VAR_secret_key: ${{ secrets.TF_VAR_secret_key }}
+        run: terraform apply -auto-approve -input=false
+
+      - name: Force ECS service deployment
+        run: |
+          aws ecs update-service \
+            --cluster "${{ steps.tf.outputs.ecs_cluster }}" \
+            --service "${{ steps.tf.outputs.ecs_service }}" \
+            --force-new-deployment \
+            --region "${{ secrets.AWS_REGION }}"
+          aws ecs wait services-stable \
+            --cluster "${{ steps.tf.outputs.ecs_cluster }}" \
+            --services "${{ steps.tf.outputs.ecs_service }}" \
+            --region "${{ secrets.AWS_REGION }}"
+
+      - name: Deployment summary
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "## Deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Image tag: ${{ steps.meta.outputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- URL: http://$(terraform output -raw alb_dns_name)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Docs: http://$(terraform output -raw alb_dns_name)/docs" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Marine: http://$(terraform output -raw alb_dns_name)/marine/" >> "$GITHUB_STEP_SUMMARY"
