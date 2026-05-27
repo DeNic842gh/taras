@@ -6,51 +6,50 @@
   <title>Houshou Marine | Captain of the Houshou Pirates</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=5" />
 </head>
 <body>
   <header class="site-header">
     <div class="header-inner">
-      <a class="logo" href="#">Ahoy! <span>Marine</span></a>
+      <a class="logo" href="#">Houshou Marine</a>
       <nav>
-        <a href="#about">About</a>
-        <a href="#outfits">Outfits</a>
-        <a href="#music">Music</a>
+        <a href="#profile">Profile</a>
       </nav>
+      <div class="header-auth">
+        <span class="user-badge" id="user-badge" hidden>
+          Ahoy, <strong id="user-display-name"></strong>
+        </span>
+        <button type="button" class="btn-text" id="auth-open-btn">Log in</button>
+        <button type="button" class="btn-text" id="logout-btn" hidden>Log out</button>
+      </div>
     </div>
   </header>
 
   <main>
-    <section class="hero" id="top">
-      <div class="hero-bg"></div>
-      <div class="hero-content">
-        <p class="hero-greeting">Ahoy! Captain of the Houshou Pirates,</p>
-        <h1>Houshou Marine</h1>
-        <p class="hero-jp">宝鐘マリン</p>
-        <p class="hero-tagline">Keep 'er steady! — Your treasure awaits on the high seas.</p>
-        <a class="btn" href="#about">Meet the Captain</a>
-      </div>
-      <div class="hero-visual">
-        <div class="outfit-frame" id="hero-outfit-frame">
-          <img id="hero-outfit-img" src="" alt="Houshou Marine outfit" />
-          <div class="outfit-label">
-            <span id="outfit-name-en">Classic Pirate Captain</span>
-            <span id="outfit-name-jp">定番パイレーツ</span>
-          </div>
-        </div>
-        <div class="outfit-picker" id="outfit-picker" aria-label="Choose Marine outfit"></div>
-      </div>
-    </section>
+    <section class="profile" id="profile">
+      <div class="profile-layout">
+        <aside class="gallery-rail" aria-label="Character gallery">
+          <ul class="thumb-list" id="thumb-list"></ul>
+          <span class="gallery-arrow" aria-hidden="true">▼</span>
+        </aside>
 
-    <section class="about" id="about">
-      <div class="container">
-        <h2>About Senchou</h2>
-        <p class="lead">
-          “Ahoy! Captain of the Houshou Pirates, Houshou Marine here!” “Keep 'er steady!”
-        </p>
-        <div class="about-grid">
-          <article class="bio">
+        <div class="visual-stage">
+          <div class="visual-watermark" id="visual-watermark" aria-hidden="true"></div>
+          <img
+            class="main-visual"
+            id="main-visual"
+            src="assets/Houshou-Marine_pr-img_01.png"
+            alt="Houshou Marine"
+          />
+        </div>
+
+        <article class="profile-copy">
+          <h1>Houshou Marine</h1>
+          <p class="name-jp">宝鐘マリン</p>
+          <p class="quote">“Ahoy! Captain of the Houshou Pirates, Houshou Marine here!”</p>
+          <p class="quote">“Keep 'er steady!”</p>
+          <div class="bio">
             <p>
               Loves jewels, treasure, and money. Her dream is to become a pirate and go treasure hunting.
               To earn a pirate ship, she stacks gold as a VTuber on land — which also means she is
@@ -66,42 +65,29 @@
               Profile from
               <a href="https://hololive.hololivepro.com/en/talents/houshou-marine/" target="_blank" rel="noopener">hololive official</a>.
             </p>
-          </article>
-          <aside class="facts">
-            <h3>Captain's Log</h3>
-            <dl>
-              <dt>Birthday</dt><dd>July 30</dd>
-              <dt>Debut</dt><dd>August 11, 2019</dd>
-              <dt>Height</dt><dd>150 cm</dd>
-              <dt>Unit</dt><dd>hololive 3rd Generation</dd>
-              <dt>Illustrator</dt><dd>Akasa Ai</dd>
-              <dt>Dream</dt>
-              <dd>Procure a pirate ship and sail with her crew — “My greatest treasure was this scenery and the friends we made along the way.”</dd>
-            </dl>
-            <h3>Likes &amp; Skills</h3>
-            <p>Dating sims, shooters, hololive members, vivacious ladies, and you… lovely crew! ♡</p>
-            <p><strong>Special skills:</strong> brushing teeth, drawing, mimicry.</p>
-          </aside>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="treasure-zone" aria-label="Interactive buttons">
+      <div class="action-buttons">
+        <div class="action-item">
+          <div class="button-burst" aria-hidden="true"></div>
+          <button type="button" class="treasure-btn" id="treasure-btn" aria-label="Play Marine treasure sound">
+            <img src="assets/1.png" alt="Treasure chest" width="72" height="72" />
+          </button>
+          <p class="treasure-hint">Tap the chest — if ye dare!</p>
+          <audio id="marine-audio" src="assets/marine-tskr.mp3" preload="auto"></audio>
         </div>
-      </div>
-    </section>
-
-    <section class="outfits-section" id="outfits">
-      <div class="container">
-        <h2>Captain's Wardrobe</h2>
-        <p class="section-desc">Tap an outfit to change Marine's look on deck.</p>
-        <div class="outfit-gallery" id="outfit-gallery"></div>
-      </div>
-    </section>
-
-    <section class="music" id="music">
-      <div class="container">
-        <h2>Popular Songs</h2>
-        <p class="section-desc">
-          Originals and hits from
-          <a href="https://www.youtube.com/@HoushouMarine/videos" target="_blank" rel="noopener">Marine Ch. on YouTube</a>.
-        </p>
-        <div class="song-grid" id="song-grid"></div>
+        <div class="action-item">
+          <div class="button-burst" aria-hidden="true"></div>
+          <button type="button" class="treasure-btn laugh-btn" id="laugh-btn" aria-label="Play Marine laugh">
+            <img src="assets/2.png" alt="Marine laugh" width="72" height="72" />
+          </button>
+          <p class="treasure-hint">Tap for a laugh!</p>
+          <audio id="laugh-audio" src="assets/houshou-marine-laugh.mp3" preload="auto"></audio>
+        </div>
       </div>
     </section>
   </main>
@@ -115,6 +101,44 @@
     </p>
   </footer>
 
-  <script src="js/main.js"></script>
+  <div class="auth-overlay" id="auth-overlay" hidden>
+    <div class="auth-modal" role="dialog" aria-labelledby="auth-title" aria-modal="true">
+      <button type="button" class="auth-close" id="auth-close" aria-label="Close">&times;</button>
+      <h2 id="auth-title">Join the crew</h2>
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-tab="login">Log in</button>
+        <button type="button" class="auth-tab" data-tab="register">Register</button>
+      </div>
+      <p class="auth-error" id="auth-error" hidden></p>
+      <form class="auth-form" id="login-form">
+        <label>
+          Email
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>
+          Password
+          <input type="password" name="password" required minlength="8" autocomplete="current-password" />
+        </label>
+        <button type="submit" class="btn-primary">Log in</button>
+      </form>
+      <form class="auth-form" id="register-form" hidden>
+        <label>
+          Username
+          <input type="text" name="username" required minlength="3" maxlength="64" pattern="[a-zA-Z0-9_]+" autocomplete="username" />
+        </label>
+        <label>
+          Email
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>
+          Password
+          <input type="password" name="password" required minlength="8" autocomplete="new-password" />
+        </label>
+        <button type="submit" class="btn-primary">Create account</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/main.js?v=5"></script>
 </body>
 </html>
