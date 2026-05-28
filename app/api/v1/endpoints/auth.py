@@ -3,7 +3,6 @@ from fastapi import APIRouter, Response, status
 from app.api.auth_cookies import clear_access_token_cookie, set_access_token_cookie
 from app.api.deps import CurrentUserDep, SessionDep
 from app.schemas.auth import AuthResponse, AuthUser, LoginRequest, RegisterRequest
-from app.schemas.user import UserResponse
 from app.services.auth_service import AuthService
 
 router = APIRouter()

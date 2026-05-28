@@ -2,7 +2,6 @@ from fastapi import APIRouter
 
 from app.core.config import settings
 from app.schemas.health import HealthResponse
-from app.storage.user_memory import user_memory_store
 
 router = APIRouter()
 
