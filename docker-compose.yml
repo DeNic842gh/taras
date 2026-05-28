@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # API + PostgreSQL. Frontend (marine-site) served at /marine/
 # Run: docker compose up -d --build
 
@@ -53,3 +54,61 @@ services:
 
 volumes:
   postgres_data:
+=======
+# API + PostgreSQL. Frontend (marine-site) served at /marine/
+# Run: docker compose up -d --build
+
+name: fastapi
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: fastapi_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-appsecret}
+      POSTGRES_DB: ${POSTGRES_DB:-fastapi_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-fastapi_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi_app
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./marine-site:/app/marine-site
+      - ./app:/app/app
+      - ./scripts/docker-entrypoint.sh:/docker-entrypoint.sh
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      USE_MEMORY_STORE: "false"
+      HOST: 0.0.0.0
+      PORT: 8000
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-appsecret}
+      POSTGRES_DB: ${POSTGRES_DB:-fastapi_db}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-appsecret}@db:5432/${POSTGRES_DB:-fastapi_db}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+>>>>>>> 3fd317d37b7cea1ba60607af56a3a56bc53120a9
